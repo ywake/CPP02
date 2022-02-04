@@ -8,26 +8,23 @@ uniq = $(if $1,$(firstword $1) $(call uniq,$(filter-out $(firstword $1),$1)))
 # Variables #
 #############
 
+# TODO: fill in here
 NAME	:= program_name
-B_NAME	:= program_name_b
-CC		:= gcc
-INCLUDE	:= -I./includes
-CFLAGS	:= -g -Wall -Werror -Wextra $(INCLUDE)
-LIBS	:=
-VPATH	:= srcs/
+SRCS	:=
+TEST_CPP:=
 
-SRCS	:= main.c
+CXX		:= c++
+CXXFLAGS:= -g -Wall -Werror -Wextra -std=c++98 -pedantic
+
 SRCDIRS	:= $(call uniq, $(dir $(SRCS)))
 
-OBJDIR	:= objs/
+OBJDIR	:= build/
 OBJDIRS	:= $(addprefix $(OBJDIR), $(SRCDIRS))
-OBJS	:= $(addprefix $(OBJDIR), $(SRCS:%.c=%.o))
+OBJS	:= $(addprefix $(OBJDIR), $(SRCS:%.cpp=%.o))
 
-B_SRCS	:= main_bonus.c
-B_OBJS	:= $(B_SRCS:%.c=$(SRCDIR)%.o)
-B_FLG	:= .bonus_flg
+DEPS	:= $(addprefix $(OBJDIR), $(SRCS:%.cpp=%.d))
 
-DSTRCTR	:= ./tests/destructor.c
+DSTRCTR	:= ./destructor.c
 
 #################
 # General rules #
@@ -36,22 +33,19 @@ DSTRCTR	:= ./tests/destructor.c
 all: $(NAME)
 
 $(NAME): $(OBJDIRS) $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LIBS)
-
-bonus: $(B_FLG)
-
-$(B_FLG): $(OBJDIRS) $(B_OBJS)
-	$(CC) $(CFLAGS) $(B_OBJS) -o $(NAME) $(LIBS)
-	touch $(B_FLG)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME) $(LIBS)
 
 clean: FORCE
-	$(RM) $(OBJS) $(B_OBJS)
+	$(RM) $(OBJS) $(DEPS)
 
 fclean: clean
-	$(RM) $(NAME) $(B_NAME)
-	$(RM) -r $(NAME).dSYM $(B_NAME).dSYM
+	$(RM) $(NAME)
+	$(RM) -r $(NAME).dSYM
 
 re: fclean all
+
+run: $(NAME)
+	./$(NAME)
 
 norm: FORCE
 	@printf "$(RED)"; norminette | grep -v ": OK!" \
@@ -61,10 +55,12 @@ norm: FORCE
 $(OBJDIRS):
 	mkdir -p $@
 
-$(OBJDIR)%.o: %.c
+$(OBJDIR)%.o: %.cpp
 	@printf "$(THIN)$(ITALIC)"
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
 	@printf "$(END)"
+
+-include $(DEPS)
 
 .PHONY: FORCE
 FORCE:
@@ -77,44 +73,27 @@ $(DSTRCTR):
 	curl https://gist.githubusercontent.com/ywake/793a72da8cdae02f093c02fc4d5dc874/raw/destructor.c > $(DSTRCTR)
 
 sani: $(OBJDIRS) $(OBJS)
-	$(CC) $(CFLAGS) -fsanitize=address $(OBJS) -o $(NAME) $(LIBS)
+	$(CXX) $(CXXFLAGS) -fsanitize=address $(OBJS) -o $(NAME) $(LIBS)
 
 Darwin_leak: $(DSTRCTR) $(OBJDIRS) $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(DSTRCTR) -o $(NAME) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(OBJS) $(DSTRCTR) -o $(NAME) $(LIBS)
 
 Linux_leak: sani
 
 leak: $(shell uname)_leak
 
-bonus_sani: $(OBJDIRS) $(B_OBJS)
-	$(CC) $(CFLAGS) -fsanitize=address $(B_OBJS) -o $(B_NAME) $(LIBS)
-
-bonus_Darwin_leak: $(DSTRCTR) $(OBJDIRS) $(B_OBJS)
-	$(CC) $(CFLAGS) $(B_OBJS) $(DSTRCTR) -o $(B_NAME) $(LIBS)
-
-bonus_Linux_leak: bonus_sani
-
-bonus_leak: bonus_$(shell uname)_leak
-
 ##############
 # Test rules #
 ##############
 
-CXX			:= clang++
-CXXFLAG		:= -std=c++11 -DDEBUG -g -fsanitize=integer -fsanitize=address -Wno-writable-strings
+gTestFlag	:= -std=c++11 -DDEBUG -g -fsanitize=integer -fsanitize=address -Wno-writable-strings
 gTestDir	:= ./.google_test
 gVersion	:= release-1.11.0
 gTestVer	:= googletest-$(gVersion)
 gTest		:= $(gTestDir)/gtest $(gTestDir)/$(gTestVer)
 
-TESTDIR		:= ./tests/
-TESTSRCS_C	:= $(filter-out main.c,$(SRCS))
-TESTSRCS_CPP:= $(wildcard $(TESTDIR)*.cpp)
-TESTOBJS	:= $(addprefix $(SRCDIR), $(TESTSRCS_C:%.c=%.o)) \
-				$(TESTSRCS_CPP:%.cpp=%.o)
-
-%.o: %.cpp
-	$(CXX) $(CXXFLAG) -I$(gTestDir) $(INCLUDE) -c $< -o $@
+TEST_SRCS	:= $(filter-out main.cpp, $(SRCS))
+TEST_OBJS	:= $(addprefix $(OBJDIR), $(TEST_SRCS:%.cpp=%.o))
 
 $(gTest):
 	mkdir -p $(gTestDir)
@@ -124,17 +103,17 @@ $(gTest):
 	python $(gTestVer)/googletest/scripts/fuse_gtest_files.py $(gTestDir)
 	mv $(gTestVer) $(gTestDir)
 
-test: $(gTest) $(TESTOBJS)
-	@$(CXX) $(CXXFLAG) \
-		$(TESTOBJS) \
+tester: $(gTest) $(OBJDIRS) $(TEST_OBJS)
+	$(CXX) $(gTestFlag) \
+		$(TEST_OBJS) $(TEST_CPP) \
 		$(gTestDir)/$(gTestVer)/googletest/src/gtest_main.cc \
 		$(gTestDir)/gtest/gtest-all.cc \
-		-I$(gTestDir) $(INCLUDE) $(LIBS) -lpthread -o test && ./test
+		-I$(gTestDir) $(INCLUDE) $(LIBS) -lpthread -o tester
 
-test_clean: FORCE
-	$(RM) $(TESTOBJS)
+test: tester
+	./tester
 
-test_fclean: test_clean
+test_fclean: FORCE
 	$(RM) -r tester tester.dSYM
 
 test_re: test_fclean test

@@ -8,11 +8,11 @@
 !Makefile
 !README.md
 !**/
-!*.c
-!*.h
+!*.cpp
+!*.hpp
 
 
 # tests
 destructor.c
 !auto_test.sh
-gtest
+.google_test
