@@ -6,7 +6,7 @@
 /*   By: ywake <ywake@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/09 18:08:27 by ywake             #+#    #+#             */
-/*   Updated: 2022/02/10 12:55:23 by ywake            ###   ########.fr       */
+/*   Updated: 2022/02/10 13:19:40 by ywake            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 class Fixed
 {
 private:
-  static const int _width = 8;
+  static const int _binalyPoint = 8;
   int _rawBits;
 
 public:

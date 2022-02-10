@@ -6,7 +6,7 @@
 /*   By: ywake <ywake@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/09 18:09:05 by ywake             #+#    #+#             */
-/*   Updated: 2022/02/10 13:01:41 by ywake            ###   ########.fr       */
+/*   Updated: 2022/02/10 13:19:30 by ywake            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,6 @@ int Fixed::getRawBits(void) const
 
 void Fixed::setRawBits(int const raw)
 {
-	std::cout << "setRawBits member function called" << std::endl;
+  std::cout << "setRawBits member function called" << std::endl;
   _rawBits = raw;
 }
