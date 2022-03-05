@@ -6,7 +6,7 @@
 /*   By: ywake <ywake@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/10 11:22:11 by ywake             #+#    #+#             */
-/*   Updated: 2022/02/10 16:21:36 by ywake            ###   ########.fr       */
+/*   Updated: 2022/03/06 01:43:24 by ywake            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,19 +31,42 @@ void subject(void)
 
 void myTest(void)
 {
-  Fixed a(5.05f);
+  Fixed a(5.0f);
   Fixed const b(2);
 
   std::cout << std::endl << "myTest" << std::endl;
   std::cout << "a: " << a << std::endl;
-  std::cout << "b: " << b << std::endl;
+  std::cout << "b: " << b << std::endl << std::endl;
+
+  std::cout << "++a: " << ++a << std::endl;
+  std::cout << "--a: " << --a << std::endl;
+  std::cout << "a++: " << a++ << std::endl;
+  std::cout << "a--: " << a-- << std::endl;
+  std::cout << "a: " << a << std::endl << std::endl;
+
+  std::cout << "a: " << a << std::endl;
+  std::cout << "b: " << b << std::endl << std::endl;
+
+  std::cout << "a + b: " << a + b << std::endl;
+  std::cout << "a - b: " << a - b << std::endl;
+  std::cout << "a * b: " << a * b << std::endl;
+  std::cout << "a / b: " << a / b << std::endl;
+  try
+  {
+    std::cout << "a / 0: " << a / 0 << std::endl << std::endl;
+  }
+  catch(const std::range_error& e)
+  {
+    std::cout << e.what() << std::endl << std::endl;
+  }
+
 
   std::cout << "(a > b): " << (a > b) << std::endl;
   std::cout << "(a < b): " << (a < b) << std::endl;
   std::cout << "(a >= b): " << (a >= b) << std::endl;
   std::cout << "(a <= b): " << (a <= b) << std::endl;
   std::cout << "(a == b): " << (a == b) << std::endl;
-  std::cout << "(a != b): " << (a != b) << std::endl;
+  std::cout << "(a != b): " << (a != b) << std::endl << std::endl;
 
   std::cout << "min: " << Fixed::min( a, b ) << std::endl;
 }

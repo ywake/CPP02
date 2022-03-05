@@ -88,7 +88,7 @@ leak: $(shell uname)_leak
 
 test: all
 	./$(NAME) > out
-	diff -y expect out
+	diff -y -W 80 expect out
 
 ##########
 # Colors #

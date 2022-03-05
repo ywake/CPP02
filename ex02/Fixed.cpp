@@ -6,7 +6,7 @@
 /*   By: ywake <ywake@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/09 18:09:05 by ywake             #+#    #+#             */
-/*   Updated: 2022/02/10 16:16:20 by ywake            ###   ########.fr       */
+/*   Updated: 2022/03/06 01:45:52 by ywake            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <stdexcept>
 
 Fixed::Fixed(void) : _rawBits(0) { }
 Fixed::Fixed(const int integer) : _rawBits(integer << _binalyPoint) { }
@@ -39,24 +40,42 @@ Fixed &Fixed::operator=(const Fixed &other)
 
 Fixed Fixed::operator+(const Fixed &other) const
 {
-  return Fixed(_rawBits + other.getRawBits());
+  Fixed res;
+
+  res.setRawBits(_rawBits + other.getRawBits());
+  return res;
 }
 
 Fixed Fixed::operator-(const Fixed &other) const
 {
-  return Fixed(_rawBits - other.getRawBits());
+  Fixed res;
+
+  res.setRawBits(_rawBits - other.getRawBits());
+  return res;
 }
 
 Fixed Fixed::operator*(const Fixed &other) const
 {
-  return Fixed(toFloat() * other.toFloat());
+  Fixed res;
+  size_t val[3];
+
+  val[0] = _rawBits;
+  val[1] = other.getRawBits();
+  val[2] = val[0] * val[1];
+  res.setRawBits(val[2] >> _binalyPoint);
+  return res;
 }
 
 Fixed Fixed::operator/(const Fixed &other) const
 {
-  int res = _rawBits / other.getRawBits();
+  Fixed res;
+  size_t divideFrom;
 
-  return Fixed(res << _binalyPoint);
+  if (other.getRawBits() == 0)
+    throw std::range_error("Divided by zero.");
+  divideFrom = _rawBits << _binalyPoint;
+  res.setRawBits(divideFrom / other.getRawBits());
+  return res;
 }
 
 Fixed &Fixed::operator++(void)
