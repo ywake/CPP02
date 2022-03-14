@@ -6,7 +6,7 @@
 /*   By: ywake <ywake@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/09 18:09:05 by ywake             #+#    #+#             */
-/*   Updated: 2022/03/09 13:47:35 by ywake            ###   ########.fr       */
+/*   Updated: 2022/03/13 13:45:14 by ywake            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <stdexcept>
 
 Fixed::Fixed(void) : _rawBits(0) {}
-Fixed::Fixed(const int integer) : _rawBits(integer << _binalyPoint) {}
+Fixed::Fixed(const int integer) : _rawBits(integer * (1 << _binalyPoint)) {}
 Fixed::Fixed(const float fraction) :
     _rawBits(roundf(fraction * (1 << _binalyPoint)))
 {
@@ -157,11 +157,11 @@ float Fixed::toFloat(void) const
   float f;
 
   f = static_cast<float>(_rawBits);
-  f /= 1 << _binalyPoint;
+  f /= (1 << _binalyPoint);
   return f;
 }
 
-int Fixed::toInt(void) const { return _rawBits >> _binalyPoint; }
+int Fixed::toInt(void) const { return _rawBits / (1 << _binalyPoint); }
 
 const Fixed &Fixed::min(const Fixed &a, const Fixed &b)
 {

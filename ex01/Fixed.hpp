@@ -6,14 +6,14 @@
 /*   By: ywake <ywake@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/09 18:08:27 by ywake             #+#    #+#             */
-/*   Updated: 2022/02/10 14:32:22 by ywake            ###   ########.fr       */
+/*   Updated: 2022/03/12 17:59:31 by ywake            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FIXED_HPP
-# define FIXED_HPP
+#define FIXED_HPP
 
-# include <ostream>
+#include <ostream>
 
 class Fixed
 {
@@ -34,8 +34,8 @@ public:
   int getRawBits(void) const;
   void setRawBits(int const raw);
 
-  float toFloat( void ) const;
-  int toInt( void ) const;
+  float toFloat(void) const;
+  int toInt(void) const;
 };
 
 std::ostream &operator<<(std::ostream &os, const Fixed &fixed);
